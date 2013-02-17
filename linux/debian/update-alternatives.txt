@@ -1,0 +1,31 @@
+
+Debian GNU/Linux 6.0
+
+装软件时，老是提示下面的错误:
+
+-----------------------------------------------------------
+update-alternatives: unknown argument `--quiet'
+
+Usage: update-alternatives --install <link> <name> <path> <priority>
+       update-alternatives --remove <name> <path>
+	          update-alternatives --help
+			  <link> is the link pointing to the provided path (ie. /usr/bin/foo).
+			  <name> is the name in /usr/lib/ipkg/alternatives/alternatives (ie. foo)
+	<path> is the name referred to (ie. /usr/bin/foo-extra-spiffy)
+	<priority> is an integer; options with higher numbers are chosen.
+
+	dpkg: ostrzeżenie - poprzedni skrypt pre-removal zwrócił kod błędu 2
+	dpkg - próba wywołania skryptu z nowego pakietu ...
+	update-alternatives: unknown argument `--quiet'
+
+	Usage: update-alternatives --install <link> <name> <path> <priority>
+	       update-alternatives --remove <name> <path>
+		          update-alternatives --help
+				  <link> is the lin...
+
+在网上查了之后，发现 debian及ubuntu系统中存在两个同名的命令。默认调用/usr/local/bin/update-alternatives
+此命令不支持 --quit 
+
+
+解决方法:
+将PATH变量中的 /usr/sbin/放在前面，即可了。
