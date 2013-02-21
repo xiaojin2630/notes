@@ -1,0 +1,16 @@
+
+
+2013/02/21
+==========================================
+用来监控  telnet + serial 用户执行的命令。
+本人尝试了好多的版本也未能在debian ucf上成功。
+
+从网上下载的源码make 之后，一运行直接segfault error.
+
+后来发现 debian : apt-get install ttysnoop下载下来的可以执行。
+
+这时下载源码 发现有patches:
+   apt-get source ttysnoop 
+   patch -p1 <patches/*.diff后，make ，run后没有 segfault error,但工具还是运行不正常。
+
+
