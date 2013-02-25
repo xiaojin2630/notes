@@ -1,0 +1,69 @@
+
+hdparm
+--------------------------
+用来获取 磁盘的SerialNo
+
+我常用busybox自带的hdparm ,由于显示的serialNo后面可能有空格,这在console中看不出来,故加上||表示:
+
+100_50 [ root ]# ./busybox  hdparm -i /dev/sda
+
+/dev/sda:
+hdparm: ioctl 0x304 failed: Inappropriate ioctl for device
+
+ Model=SUNDOM 64MB                             , FwRev=V051129 , SerialNo(21)=|JYJ2006Y11M 00001383|
+ Config={ HardSect NotMFM HdSw>15uSec Fixed DTR>10Mbs }
+ RawCHS=1000/4/32, TrkSize=0, SectSize=512, ECCbytes=4
+ BuffType=(1) 1Sect, BuffSize=0kB, MaxMultSect=1, MultSect=?1?
+ CurCHS=1000/4/32, CurSects=128000, LBA=yes, LBAsects=128000
+ IORDY=on/off, tPIO={min:120,w/IORDY:120}, tDMA={min:120,rec:120}
+ PIO modes:  pio0 pio1 pio2 pio3 pio4
+ DMA modes:  mdma0 mdma1 *mdma2
+ AdvancedPM=no
+
+ * current active mode
+
+fnd-2_10.50总是不能用fnd-2_10.50总是不能用
+查看到了serialNo和fd-2获取的没有错，但发现两字符串的长度却不一样。实际获取的是长度21，但数了下字符串也共就20个。
+后来将每个数组元素打印出来，发现还有一个数值=1的ascii码。现在没法绑定，可以前就是这样可以正常使用。
+==========================================================================================
+
+ [restrict] common.c 181: num=0,open ... device=/dev/hda,fd=|-1076790024|
+ [restrict] common.c 181: num=1,open ... device=/dev/hdb,fd=|-1|
+ [restrict] common.c 181: num=2,open ... device=/dev/hdc,fd=|-1|
+ [restrict] common.c 181: num=3,open ... device=/dev/hdd,fd=|-1|
+ [restrict] common.c 181: num=4,open ... device=/dev/hde,fd=|-1|
+ [restrict] common.c 181: num=5,open ... device=/dev/sda,fd=|-1|
+ [restrict] common.c 190: checking i=5 , device /dev/sda ,DISK_SerialNo(len=20)=|JYJ2006Y11M 00001383|,
+GET_SN(len=21)=|JYJ2006Y11M 00001383|
+0=|J|->|74|
+1=|Y|->|89|
+2=|J|->|74|
+3=|2|->|50|
+4=|0|->|48|
+5=|0|->|48|
+6=|6|->|54|
+7=|Y|->|89|
+8=|1|->|49|
+9=|1|->|49|
+10=|M|->|77|
+11=| |->|32|
+12=|0|->|48|
+13=|0|->|48|
+14=|0|->|48|
+15=|0|->|48|
+16=|1|->|49|
+17=|3|->|51|
+18=|8|->|56|
+19=|3|->|51|
+20=||->|1|
+21=||->|0|
+22=||->|0|
+23=||->|0|
+24=||->|0|
+ [restrict] common.c 181: num=5,open ... device=/dev/sdb,fd=|8|
+ [restrict] common.c 181: num=6,open ... device=/dev/sdc,fd=|-1|
+ [restrict] common.c 181: num=7,open ... device=/dev/sdd,fd=|-1|
+ [restrict] common.c 181: num=8,open ... device=/dev/sde,fd=|-1|
+ 9 ...
+
+
