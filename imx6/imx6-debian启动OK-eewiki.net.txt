@@ -1,0 +1,276 @@
+
+
+http://www.eewiki.net/display/linuxonarm/i.MX6x+SABRE+Lite#i.MX6xSABRELite-Ubuntu13.04(Raring)RootFileSystem
+
+GCC Toolchain
+==================
+wget https://launchpad.net/linaro-toolchain-binaries/trunk/2013.03/+download/gcc-linaro-arm-linux-gnueabihf-4.7-2013.03-20130313_linux.tar.bz2
+tar xjf gcc-linaro-arm-linux-gnueabihf-4.7-2013.03-20130313_linux.tar.bz2
+export CC=`pwd`/gcc-linaro-arm-linux-gnueabihf-4.7-2013.03-20130313_linux/bin/arm-linux-gnueabihf-
+
+U-Boot Download:
+===================
+Download U-Boot via git:
+git clone git://git.denx.de/u-boot.git
+cd u-boot/
+git checkout v2013.04 -b tmp
+
+U-Boot Patches:
+===================
+git pull --no-edit git://github.com/RobertCNelson/u-boot-boards.git v2013.04_mx6qsabrelite
+wget -c https://raw.github.com/eewiki/u-boot-patches/master/v2013.04/0001-mx6qsabrelite-uEnv.txt-bootz-n-fixes.patch
+patch -p1 < 0001-mx6qsabrelite-uEnv.txt-bootz-n-fixes.patch
+
+
+U-Boot Configure and Build:
+===================
+make ARCH=arm CROSS_COMPILE=${CC} distclean
+make ARCH=arm CROSS_COMPILE=${CC} mx6qsabrelite_config
+make ARCH=arm CROSS_COMPILE=${CC}
+
+
+Linux Kernel
+===================
+Linux Build Script:
+git clone git://github.com/RobertCNelson/imx-devel.git
+cd imx-devel/
+
+For Mainline v3.9.x: (currently no video)
+Bug:
+Status:
+Link:
+USB Hotplug
+fixed: v3.9.0-rc4-imx0.2
+Commit
+Blank MAC address
+fixed: v3.9.0-rc8-imx2.1
+Commit
+git checkout origin/v3.9.x-imx -b tmp
+Run Build Script:
+./build_kernel.sh
+The kernel zImage and modules will be under the deploy directory.
+
+
+Debian 7.0.0 (Wheezy) Root File System
+========================================
+Default User: debian
+Password: temppwd
+Root User: root
+Root Password: root
+wget -c http://rcn-ee.net/deb/minfs/wheezy/debian-7.0.0-minimal-armhf-2013-05-05.tar.xz
+verify the image with:
+md5sum debian-7.0.0-minimal-armhf-2013-05-05.tar.xz
+7378ac1f20ca4857ac1994e22fd20277  debian-7.0.0-minimal-armhf-2013-05-05.tar.xz
+Extract Image:
+tar xJf debian-7.0.0-minimal-armhf-2013-05-05.tar.xz
+
+
+Ubuntu 13.04 (Raring) Root File System
+=========================================
+Default User: ubuntu
+Password: temppwd
+wget -c http://rcn-ee.net/deb/minfs/raring/ubuntu-13.04-minimal-armhf-2013-05-05.tar.xz
+verify the image with:
+md5sum debian-7.0.0-minimal-armhf-2013-05-05.tar.xz
+952cf1f87c047653fb0f24818c8bfd26  ubuntu-13.04-minimal-armhf-2013-05-05.tar.xz
+Extract Image:
+tar xJf ubuntu-13.04-minimal-armhf-2013-05-05.tar.xz
+
+
+Setup microSD/SD card
+========================
+For these instruction, we are assuming: DISK=/dev/mmcblk0, "sudo fdisk -l" is useful for determining the device id..
+export DISK=/dev/mmcblk0
+Erase microSD/SD card:
+sudo dd if=/dev/zero of=${DISK} bs=1024 count=1024
+sudo parted --script ${DISK} mklabel msdos
+Install U-Boot Bootloader:
+We are moving back to using SPI flash over SD card, this will remain for compatibility sake.
+sudo dd if=./u-boot/u-boot.imx of=${DISK} bs=512 seek=2
+Setup Boot Partition:
+sudo parted --script ${DISK} mkpart primary ext2 2 52
+sudo parted --script ${DISK} mkpart primary ext4 53 -1
+
+Format Boot Partition as ext2:
+DISK=/dev/mmcblk0
+sudo mkfs.ext2 ${DISK}p1 -L boot
+(or)
+DISK=/dev/sdX
+sudo mkfs.ext2 ${DISK}1 -L boot
+
+
+
+Mount Partitions:
+==============================
+Note: On most systems these partitions will be auto-mounted...
+sudo mkdir -p /media/boot/
+sudo mkdir -p /media/rootfs/
+ 
+DISK=/dev/mmcblk0
+sudo mount ${DISK}p1 /media/boot/
+sudo mount ${DISK}p2 /media/rootfs/
+ 
+(or)
+ 
+DISK=/dev/sdX
+sudo mount ${DISK}1 /media/boot/
+sudo mount ${DISK}2 /media/rootfs/
+
+
+U-Boot uEnv.txt boot script
+=============================
+Create U-Boot "uEnv.txt" boot script: (nano uEnv.txt)
+uEnv.txt
+#console=ttymxc1,115200
+#mmcroot=/dev/mmcblk0p2 ro
+#mmcrootfstype=ext4 rootwait fixrtc
+uenvcmd=run loadzimage; run loadfdt; run mmcboot
+Copy u-boot.imx/uEnv.txt/boot.scr to the boot partition:
+sudo cp -v ./u-boot/u-boot.imx /media/boot/
+sudo cp -v ./uEnv.txt /media/boot/
+
+
+
+Install Kernel and Root File System:
+To help new users, since the kernel version can change on a daily basis. The kernel building scripts in this git repo will now give you a hint of what kernel version was built.
+-----------------------------
+Script Complete
+eewiki.net: [user@localhost:~$ export kernel_version=3.X.Y-Z]
+-----------------------------
+Copy and Paste that "export kernel_version=3.X.Y-Z" exactly as shown in your own build/desktop environment:
+export kernel_version=3.X.Y-Z
+Copy Kernel zImage:
+sudo cp -v ./imx-devel/deploy/${kernel_version}.zImage /media/boot/zImage
+Copy Kernel dtbs (Device Tree):
+sudo mkdir -p /media/boot/dtbs/
+sudo tar xfv ./imx-devel/deploy/${kernel_version}-dtbs.tar.gz -C /media/boot/dtbs/
+Copy Root File System:
+sudo tar xfvp ./*-*-minimal-arm*-*/arm*-rootfs-*.tar -C /media/rootfs/
+Copy Kernel modules:
+sudo tar xfv ./imx-devel/deploy/${kernel_version}-modules.tar.gz -C /media/rootfs/
+Setup /etc/fstab:
+sudo nano /media/rootfs/etc/fstab
+Add:
+/etc/fstab
+/dev/mmcblk0p2   /           auto   errors=remount-ro   0   1
+/dev/mmcblk0p1   /boot/uboot auto   defaults            0   2
+
+
+Enable Networking:
+sudo nano /media/rootfs/etc/network/interfaces
+Add:
+/etc/network/interfaces
+auto lo
+iface lo inet loopback
+ 
+auto eth0
+iface eth0 inet dhcp
+Enable Serial Login:
+Debian:
+sudo nano /media/rootfs/etc/inittab
+Add at end of file:
+/etc/inittab
+T1:23:respawn:/sbin/getty -L ttymxc1 115200 vt102
+Ubuntu:
+sudo nano /media/rootfs/etc/init/serial.conf
+Add:
+/etc/init/serial.conf
+start on stopped rc RUNLEVEL=[2345]
+stop on runlevel [!2345]
+ 
+respawn
+exec /sbin/getty 115200 ttymxc1
+Remove microSD/SD card:
+sync
+sudo umount /media/boot
+sudo umount /media/rootfs
+ 
+
+
+Initial boot: Upgrade Bootloader
+
+==============================
+
+Bootloader: factory v2009.08.bin -> mainline u-boot.imx
+using: SD media
+setenv mmcdev 0
+ 
+using: microSD media
+setenv mmcdev 1
+
+
+Load mainline u-boot and flash to SPI
+mmc dev ${mmcdev}
+ext2load mmc ${mmcdev}:1 0x10800000 u-boot.imx
+sf probe 1 27000000
+sf erase 0 0xc0000
+sf write 0x10800000 0x400 ${filesize}
+
+For reference: mainline -> mainline
+mmc dev ${mmcdev}
+ext2load mmc ${mmcdev}:1 0x10800000 u-boot.imx
+sf probe
+sf erase 0 0xc0000
+sf write 0x10800000 0x400 ${filesize}
+ 
+SPI Flashing Log:
+MX6Q SABRELITE U-Boot > setenv mmcdev 0
+MX6Q SABRELITE U-Boot > mmc dev ${mmcdev}
+mmc0 is current device
+MX6Q SABRELITE U-Boot > ext2load mmc ${mmcdev}:1 0x10800000 u-boot.imx
+Loading file "u-boot.imx" from mmc device 0:1 (xxa1)
+329208 bytes read
+MX6Q SABRELITE U-Boot > sf probe 1 27000000
+JEDEC ID: 0xbf:0x25:0x41
+2048 KiB SST25VF016B - 2MB at 0:1 is now current device
+MX6Q SABRELITE U-Boot > sf erase 0 0xc0000
+Erasing SPI NOR flash 0x0 [0xc0000 bytes]
+.........................................................................
+.........................................................................
+..............................................SUCCESS
+MX6Q SABRELITE U-Boot > sf write 0x10800000 0x400 ${filesize}
+Writing SPI NOR flash 0x400 [0x505f8 bytes] <- ram 0x10800000
+.....SUCCESS
+MX6Q SABRELITE U-Boot > 
+Reset by unplugging/plugging in power...
+ 
+
+
+SPI Downgrade
+======================
+Bootloader: mainline u-boot.imx -> factory v2009.08.bin
+using: SD media
+setenv mmcdev 0
+using: microSD media
+setenv mmcdev 1
+ 
+Load factory u-boot and flash to SPI
+mmc dev ${mmcdev}
+ext2load mmc ${mmcdev}:1 0x10800000 v2009.08.bin
+sf probe
+sf erase 0 0xc0000
+sf write 0x10800000 0x400 ${filesize}
+ 
+SPI Flashing Log:
+MX6QSABRELITE U-Boot > setenv mmcdev 0
+MX6QSABRELITE U-Boot > mmc dev ${mmcdev}
+mmc0 is current device
+MX6QSABRELITE U-Boot > ext2load mmc ${mmcdev}:1 0x10800000 v2009.08.bin
+210916 bytes read in 45 ms (4.5 MiB/s)
+MX6QSABRELITE U-Boot > sf probe
+SF: Detected SST25VF016B with page size 4 KiB, total 2 MiB
+MX6QSABRELITE U-Boot > sf erase 0 0xc0000
+MX6QSABRELITE U-Boot > sf write 0x10800000 0x400 ${filesize}
+MX6QSABRELITE U-Boot > 
+Reset by unplugging/plugging in power...
+ 
+SPI Flash Recovery
+i.MX6x SABRE Lite SPI Flash Recovery
+http://www.eewiki.net/display/linuxonarm/i.MX6x+SABRE+Lite+SPI+Flash+Recovery
+
+
+
+
+
+
+

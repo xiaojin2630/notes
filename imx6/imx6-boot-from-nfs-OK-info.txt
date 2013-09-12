@@ -1,0 +1,80 @@
+# cat /proc/mtd
+dev:    size   erasesize  name
+mtd0: 00040000 00001000 "bootloader"
+mtd1: 001c0000 00001000 "kernel"
+
+
+# uname -sa
+Linux iMX6QSABRELite 3.0.35-ts-armv7l #1 SMP PREEMPT Thu Jan 17 06:53:58 EST 2013 armv7l GNU/Linux
+
+
+# cat /proc/cpuinfo
+Processor	: ARMv7 Processor rev 10 (v7l)
+processor	: 0
+BogoMIPS	: 1988.29
+
+processor	: 1
+BogoMIPS	: 1988.29
+
+processor	: 2
+BogoMIPS	: 1988.29
+
+processor	: 3
+BogoMIPS	: 1988.29
+
+Features	: swp half thumb fastmult vfp edsp neon vfpv3 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x2
+CPU part	: 0xc09
+CPU revision	: 10
+
+Hardware	: Freescale i.MX 6Quad Sabre-Lite Board
+Revision	: 63000
+Serial		: 0000000000000000
+
+
+# ./busybox df -h
+Filesystem                Size      Used Available Use% Mounted on
+172.16.12.3:/lfs/timesys/i_MX6QSABRELite/rfs/
+                         53.5G     37.2G     16.4G  69% /
+/dev/mmcblk0p1            3.6G    335.1M      3.1G  10% /media/mmcblk0p1
+tmpfs                   438.1M     48.0K    438.1M   0% /tmp
+tmpfs                   438.1M         0    438.1M   0% /dev/shm
+# cd /media/mmcblk0p1
+# ls
+6q_bootscript  config         linuxrc        proc           tmp
+6q_upgrade     dev            lost+found     root           u-boot.bin
+Settings       etc            media          run            usr
+bin            home           mnt            sbin           var
+boot           lib            opt            sys
+# cat /proc/partitions 
+major minor  #blocks  name
+
+  31        0       1024 mtdblock0   ( 估计是 flash )
+  31        1       1024 mtdblock1   ( 估计是 flash )
+ 179        0    3858432 mmcblk0     ( 肯定是 TF卡 )
+ 179        1    3848192 mmcblk0p1
+
+# fdisk -l
+
+Disk /dev/mtdblock0: 1 MB, 1048576 bytes
+255 heads, 63 sectors/track, 0 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+Disk /dev/mtdblock0 doesn't contain a valid partition table
+
+Disk /dev/mtdblock1: 1 MB, 1048576 bytes
+255 heads, 63 sectors/track, 0 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+Disk /dev/mtdblock1 doesn't contain a valid partition table
+
+Disk /dev/mmcblk0: 3951 MB, 3951034368 bytes
+4 heads, 16 sectors/track, 120576 cylinders
+Units = cylinders of 64 * 512 = 32768 bytes
+
+        Device Boot      Start         End      Blocks  Id System
+/dev/mmcblk0p1             321      120576     3848192  83 Linux
+
+

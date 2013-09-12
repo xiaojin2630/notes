@@ -1,0 +1,2 @@
+setenv bootargs console=ttymxc1,115200 
+

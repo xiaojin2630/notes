@@ -1,0 +1,141 @@
+
+
+ Andriod
+====================
+
+setenv bootargs  console=ttymxc1,115200 init=/init rw no_console_suspend androidboot.console=ttymxc1 vmalloc=400M video=mxcfb0:dev=hdmi,1280x720M@60,if=RGB24 video=mxcfb1:off
+
+setenv bootargs  console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1024x768M@60,if=RGB24 video=mxcfb1:off init=/init rw no_console_suspend androidboot.console=ttymxc1 vmalloc=400M fbmem=28M
+
+setenv bootargs  console=ttymxc1,115200 video=mxcfb0:dev=hdmi,800x600M@60,if=RGB24 video=mxcfb1:off init=/init rw no_console_suspend androidboot.console=ttymxc1 vmalloc=400M fbmem=28M
+
+setenv bootargs  console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24 video=mxcfb1:off init=/init rw no_console_suspend androidboot.console=ttymxc1 vmalloc=400M  fbmem=28M
+	
+setenv bootargs  console=ttymxc1,115200 init=/init rw no_console_suspend androidboot.console=ttymxc1 vmalloc=400M ;
+setenv bootargs $bootargs video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24 video=mxcfb1:dev=lcd,800x480M@60m,if=RGB666 fbmem=28M
+
+
+fatload mmc 0:1 10800000 uimage ; fatload mmc 0:1 12800000 uramdisk.img ; bootm 10800000 12800000  
+fatload mmc 0:1 10800000 uImage_boundary_r13.4 ;fatload mmc 0:1 12800000 uramdisk.img ; bootm 10800000 12800000
+
+
+uImage_boundary_r13.4 (imx6_android_defconfig):  android可以正常启动，但无hdmi输出.
+uImage_boundary_r13.4_config.gz (/proc/config.gz): 无法编译.
+
+
+android -debian card
+==========================
+ 
+
+fbmem=10M,24M
+10M ~= 1024x768x4(32bpp)x3(triple buffer)
+24M ~= 1920x1080x4(32bpp)x3(triple buffer)
+
+
+
+NFS
+===============
+setenv bootargs console=ttymxc1,115200 ip=172.16.12.6 root=/dev/nfs rw nfsroot=172.16.12.3:/lfs/timesys/i_MX6QSABRELite/rfs
+setenv serverip 172.16.12.3
+setenv ipaddr   172.16.12.6
+setenv netmask 255.255.0.0
+setenv ethaddr 00:11:22:33:44:55
+setenv bootcmd tftpboot 172.16.12.3:uImage ; bootm 0x12000000
+
+
+TFTP
+==================
+setenv bootcmd tftp
+setenv ethaddr 00:11:22:33:44:55 
+setenv bootfile uImage
+boot
+bootm
+
+setenv bootcmd tftpboot 172.16.12.3:uImage \; bootm
+boot
+
+
+
+
+
+ 针对 ubuntu的硬件图形加速 配置
+==============================
+
+Hardware Accelerated Graphics
+
+Due to boot performance issue, the graphics kernel driver has been built as a module. As the graphics kernel driver module (i.e. galcore.ko) needs 128MB vmalloc space by default, it's recommended that the following be placed in the kernel command line:
+vmalloc=192M
+And the module won't be loaded automatically, as the modalias has changed after moving to device tree, one has to load the module manually before the graphics demos can be executed:
+modprobe galcore
+
+
+
+linaro-precise-alip-20121124-519.tar.gz (ubuntu 12.11)
+=====================================================
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,800x600M@60,if=RGB24 root=/dev/mmcblk0p1 rootwait fixrtc vmalloc=192M  
+ext2load mmc 1:1 10800000 /boot/uImage && bootm 10800000;
+
+
+
+
+
+ SD (debian) 
+=================
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24 root=/dev/mmcblk1p2 rootwait fixrtc 
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1440x900M@60,if=RGB24 root=/dev/mmcblk1p2 rootwait fixrtc
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1280x720M@60,if=RGB24 root=/dev/mmcblk1p2 rootwait fixrtc 
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1024x768M@60,if=RGB24 root=/dev/mmcblk1p2 rootwait fixrtc 
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,800x600M@60,if=RGB24 root=/dev/mmcblk1p2 rootwait fixrtc 
+
+ext2load mmc 1:1 10800000 /boot/uImage && bootm 10800000;
+
+
+启动ubuntu-11.10  (卡已取消)
+=====================
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1024x768M@60,if=RGB24 root=/dev/mmcblk0p1 rootwait fixrtc
+ext2load mmc 0:1 10800000 /boot/uImage && bootm 10800000;
+ext2load mmc 0:1 10800000 /boot/uImage-3.0-ts-armv7l && bootm 10800000;
+
+
+启动12.09  (无法apt-get install imx-meta-mx6，add-apt-repository ppa:linaro-maintainers/tools失败)
+==================================================================
+setenv bootargs console=ttymxc1,115200 root=/dev/mmcblk0p1 rootwait fixrtc
+ext2load mmc 0:1 10800000 /boot/uImage && bootm 10800000;
+
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1280x720M@60,if=RGB24 root=/dev/mmcblk0p1 rootwait fixrtc \
+vmalloc=192M  
+setenv loadaddr 0x10008000
+ext2load mmc 0:1 10800000 /boot/uImage && bootm 10800000;
+
+
+启动 11.10    (第二个分区)
+=======================
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1280x720M@60,if=RGB24 root=/dev/mmcblk0p2 rootwait fixrtc vmalloc=192M  
+ext2load mmc 0:2 10800000 /boot/uImage && bootm 10800000;
+
+
+启动 12.04 (wandboard)    (第1个分区)
+=======================
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1280x720M@60,if=RGB24 root=/dev/mmcblk0p1 rootwait fixrtc vmalloc=400M  fbmem=28M
+ext2load mmc 0:1 10800000 /boot/uImage && bootm 10800000;
+
+
+ext2load mmc 0:1 10800000 /boot/vmlinuz-3.2.0-24-linaro-lt-mx6 && bootm 10800000;
+ext2load mmc 0:1 10800000 /boot/vmlinuz-3.0.0-1007-linaro-mx51
+
+启动 12.11 precise  (第二个分区)
+=======================
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1280x720M@60,if=RGB24 root=/dev/mmcblk0p2 rootwait fixrtc vmalloc=192M  
+ext2load mmc 0:2 10800000 /boot/uImage && bootm 10800000;
+
+
+
+
+ TF (自带系统)
+=================
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,800x600M@60,if=RGB24 root=/dev/mmcblk0p1 rootwait fixrtc 
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24 root=/dev/mmcblk0p1 rootwait fixrtc 
+ext2load mmc 1:1 10800000 /boot/uImage && bootm 10800000;
+
+
+
