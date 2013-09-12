@@ -1,0 +1,27 @@
+
+2013/04/04
+
+前段时间为了精减内核，在linux-3.8中，
+
+make allnoconfig
+
+然后再将需要的enable,启动后发现 电脑的COM口,ttyS0找不到了。
+
+通过其它电脑获取到一些信息:
+
+
+xiaoj [ foo ]$ dmesg|grep -i tty
+[    0.000000] console [tty0] enabled
+[    0.804757] serial8250: ttyS0 at I/O 0x3f8 (irq = 4) is a 16550A
+[    0.805065] 00:06: ttyS0 at I/O 0x3f8 (irq = 4) is a 16550A
+xiaoj [ foo ]$ 
+
+使用了serial8250驱动，在网上查了下，原来这驱动的公司很有来头，是ARM公司前身。
+
+ Device Drivers
+   -> Character devices  
+     -> Serial drivers
+       -> 8250/16550 and compatible serial support
+
+选择上述即可。
+

@@ -1,0 +1,19 @@
+
+ 2013/03/01
+ ===================
+
+一般内核启动时，出现下面提示，可能原因有：
+(failed to excute /init ,kernel panic - not syncing : no init found. Try passing init=)
+
+ -. 当前的主机芯片如SATA/IDE未被Kernel支持。
+ -. 当前kernel未支持PC BIOS 分区表
+ -. 当前kernel未支持磁盘上的文件系统
+ -. 当前rootfs未找到 /init 
+
+如里是下面的原因，可能的原因有:
+(failed to excute /init ,kernel panic - not syncing : no init found. Try passing init=)
+Pid 1, comm: swapper Not tainted 3.8.0#10 
+
+表示kernel不能执行 /init 
+这可能是 init 要的so没有，或kernel中未支持 ELF格式.
+

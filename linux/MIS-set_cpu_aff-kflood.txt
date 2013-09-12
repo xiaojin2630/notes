@@ -1,0 +1,169 @@
+
+  裁剪的kernel-3.8 不支持set_cpu_aff命令
+
+2013/03/01 
+=================================
+
+发现kflood总是cpu_aff在 cpu id =0上。使用set_cpu_aff eth4 0 无任何反应。
+
+查看了下 /proc/interrupts 发现，少了好多接口的-tx队列。如下：
+
+
+
+
+下面是异常机器的 interrupts :
+ucf [ scripts ]# uname -sa
+Linux ucf 3.8.0 #20 SMP Fri Mar 1 13:41:20 CST 2013 i686 GNU/Linux
+
+ucf [ /data ]# cat /proc/interrupts 
+           CPU0       CPU1       CPU2       CPU3       CPU4       CPU5       CPU6       CPU7       
+  0:         14          0          0          0          0          0          0          0   IO-APIC-edge      timer
+  1:          4          0          0          0          0          0          0          0   IO-APIC-edge      i8042
+  8:          0          0          0          0          0          0          0          0   IO-APIC-edge      rtc0
+  9:          0          0          0          0          0          0          0          0   IO-APIC-fasteoi   acpi
+ 12:          5          0          0          0          0          0          0          0   IO-APIC-edge      i8042
+ 14:       1844          0          0          0          0          0          0          0   IO-APIC-edge      ata_piix
+ 15:          0          0          0          0          0          0          0          0   IO-APIC-edge      ata_piix
+ 16:     565940          0          0          0          0          0          0          0   IO-APIC-fasteoi   ehci_hcd:usb1, eth0, eth11, eth4
+ 17:     515025          0          0          0          0          0          0          0   IO-APIC-fasteoi   eth1, eth5, eth8
+ 18:     474473          0          0          0          0          0          0          0   IO-APIC-fasteoi   eth2, eth6, eth9
+ 19:     422028          0          0          0          0          0          0          0   IO-APIC-fasteoi   ata_piix, eth10, eth3, eth7
+ 23:         30          0          0          0          0          0          0          0   IO-APIC-fasteoi   ehci_hcd:usb2
+NMI:          0          0          0          0          0          0          0          0   Non-maskable interrupts
+LOC:     194214     193646     193642     193638     193638     193634     193632     193629   Local timer interrupts
+SPU:          0          0          0          0          0          0          0          0   Spurious interrupts
+PMI:          0          0          0          0          0          0          0          0   Performance monitoring interrupts
+IWI:          0          0          0          0          0          0          0          0   IRQ work interrupts
+RTR:          7          0          0          0          0          0          0          0   APIC ICR read retries
+RES:          6          1          1          1          0          1          2          1   Rescheduling interrupts
+CAL:          8          8          9          6          9          9          6          9   Function call interrupts
+TLB:          0          0          0          0          0          1          1          0   TLB shootdowns
+ERR:          0
+MIS:          0
+
+
+
+下面是正常机器的 interrupts :
+ucf [ /root ]# cat /proc/interrupts 
+           CPU0       CPU1       CPU2       CPU3       CPU4       CPU5       CPU6       CPU7       
+  0:         33          0          0          0          0          0          0          0   IO-APIC-edge      timer
+  1:          4          0          0          0          0          0          0          0   IO-APIC-edge      i8042
+  4:          2          0          0          0          0          0          0          0   IO-APIC-edge      serial
+  8:          1          0          0          0          0          0          0          0   IO-APIC-edge      rtc0
+  9:          0          0          0          0          0          0          0          0   IO-APIC-fasteoi   acpi
+ 12:          7          0          0          0          0          0          0          0   IO-APIC-edge      i8042
+ 14:          6          0          0          0          0          0          0          0   IO-APIC-edge      ata_piix
+ 15:          0          0          0          0          0          0          0          0   IO-APIC-edge      ata_piix
+ 16:         26          0          0          0          0          0          0          0   IO-APIC-fasteoi   ehci_hcd:usb1
+ 19:          0          0          0          0          0          0          0          0   IO-APIC-fasteoi   ata_piix
+ 23:         30          0          0          0          0          0          0          0   IO-APIC-fasteoi   ehci_hcd:usb2
+ 42:    1424237          0          0          0          0          0          0          0   PCI-MSI-edge      eth0-rx-0
+ 43:       1200          0          0          0          0          0          0          0   PCI-MSI-edge      eth0-tx-0
+ 44:          2          0          0          0          0          0          0          0   PCI-MSI-edge      eth0
+ 45:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth1-rx-0
+ 46:          0          0          0          0          0          0          0          0   PCI-MSI-edge      eth1-tx-0
+ 47:          1          0          0          0          0          0          0          0   PCI-MSI-edge      eth1
+ 48:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth2-rx-0
+ 49:          0          0          0          0          0          0          0          0   PCI-MSI-edge      eth2-tx-0
+ 50:          1          0          0          0          0          0          0          0   PCI-MSI-edge      eth2
+ 51:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth3-rx-0
+ 52:          0          0          0          0          0          0          0          0   PCI-MSI-edge      eth3-tx-0
+ 53:          1          0          0          0          0          0          0          0   PCI-MSI-edge      eth3
+ 54:          0          0          0          0          0          0          0          0   PCI-MSI-edge      eth4
+ 55:     281013          0          0          0          0          0          0          0   PCI-MSI-edge      eth4-TxRx-0
+ 56:      42749          0          0          0          0          0          0          0   PCI-MSI-edge      eth4-TxRx-1
+ 57:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth4-TxRx-2
+ 58:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth4-TxRx-3
+ 59:      46072          0          0          0          0          0          0          0   PCI-MSI-edge      eth4-TxRx-4
+ 60:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth4-TxRx-5
+ 61:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth4-TxRx-6
+ 62:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth4-TxRx-7
+ 63:          0          0          0          0          0          0          0          0   PCI-MSI-edge      eth5
+ 64:     281013          0          0          0          0          0          0          0   PCI-MSI-edge      eth5-TxRx-0
+ 65:      42749          0          0          0          0          0          0          0   PCI-MSI-edge      eth5-TxRx-1
+ 66:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth5-TxRx-2
+ 67:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth5-TxRx-3
+ 68:      46072          0          0          0          0          0          0          0   PCI-MSI-edge      eth5-TxRx-4
+ 69:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth5-TxRx-5
+ 70:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth5-TxRx-6
+ 71:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth5-TxRx-7
+ 72:          0          0          0          0          0          0          0          0   PCI-MSI-edge      eth6
+ 73:     281013          0          0          0          0          0          0          0   PCI-MSI-edge      eth6-TxRx-0
+ 74:      42749          0          0          0          0          0          0          0   PCI-MSI-edge      eth6-TxRx-1
+ 75:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth6-TxRx-2
+ 76:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth6-TxRx-3
+ 77:      46072          0          0          0          0          0          0          0   PCI-MSI-edge      eth6-TxRx-4
+ 78:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth6-TxRx-5
+ 79:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth6-TxRx-6
+ 80:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth6-TxRx-7
+ 81:          0          0          0          0          0          0          0          0   PCI-MSI-edge      eth7
+ 82:     281013          0          0          0          0          0          0          0   PCI-MSI-edge      eth7-TxRx-0
+ 83:      42749          0          0          0          0          0          0          0   PCI-MSI-edge      eth7-TxRx-1
+ 84:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth7-TxRx-2
+ 85:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth7-TxRx-3
+ 86:      46072          0          0          0          0          0          0          0   PCI-MSI-edge      eth7-TxRx-4
+ 87:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth7-TxRx-5
+ 88:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth7-TxRx-6
+ 89:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth7-TxRx-7
+ 90:          1          0          0          0          0          0          0          0   PCI-MSI-edge      eth8
+ 91:     267667          0          0          0          0          0          0          0   PCI-MSI-edge      eth8-TxRx-0
+ 92:      42361          0          0          0          0          0          0          0   PCI-MSI-edge      eth8-TxRx-1
+ 93:      42319          0          0          0          0          0          0          0   PCI-MSI-edge      eth8-TxRx-2
+ 94:      42319          0          0          0          0          0          0          0   PCI-MSI-edge      eth8-TxRx-3
+ 95:      42519          0          0          0          0          0          0          0   PCI-MSI-edge      eth8-TxRx-4
+ 96:      42319          0          0          0          0          0          0          0   PCI-MSI-edge      eth8-TxRx-5
+ 97:      42319          0          0          0          0          0          0          0   PCI-MSI-edge      eth8-TxRx-6
+ 98:      42319          0          0          0          0          0          0          0   PCI-MSI-edge      eth8-TxRx-7
+ 99:          2          0          0          0          0          0          0          0   PCI-MSI-edge      eth9
+100:     267545          0          0          0          0          0          0          0   PCI-MSI-edge      eth9-TxRx-0
+101:      42363          0          0          0          0          0          0          0   PCI-MSI-edge      eth9-TxRx-1
+102:      42321          0          0          0          0          0          0          0   PCI-MSI-edge      eth9-TxRx-2
+103:      42321          0          0          0          0          0          0          0   PCI-MSI-edge      eth9-TxRx-3
+104:      42521          0          0          0          0          0          0          0   PCI-MSI-edge      eth9-TxRx-4
+105:      42321          0          0          0          0          0          0          0   PCI-MSI-edge      eth9-TxRx-5
+106:      42321          0          0          0          0          0          0          0   PCI-MSI-edge      eth9-TxRx-6
+107:      42321          0          0          0          0          0          0          0   PCI-MSI-edge      eth9-TxRx-7
+108:          0          0          0          0          0          0          0          0   PCI-MSI-edge      eth10
+109:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth10-TxRx-0
+110:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth10-TxRx-1
+111:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth10-TxRx-2
+112:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth10-TxRx-3
+113:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth10-TxRx-4
+114:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth10-TxRx-5
+115:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth10-TxRx-6
+116:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth10-TxRx-7
+117:          0          0          0          0          0          0          0          0   PCI-MSI-edge      eth11
+118:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth11-TxRx-0
+119:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth11-TxRx-1
+120:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth11-TxRx-2
+121:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth11-TxRx-3
+122:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth11-TxRx-4
+123:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth11-TxRx-5
+124:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth11-TxRx-6
+125:      42320          0          0          0          0          0          0          0   PCI-MSI-edge      eth11-TxRx-7
+NMI:          0          0          0          0          0          0          0          0   Non-maskable interrupts
+LOC:   84643327   84643443   84644171   84643373   84643605   84644214   84644197   84644180   Local timer interrupts
+SPU:          0          0          0          0          0          0          0          0   Spurious interrupts
+PMI:          0          0          0          0          0          0          0          0   Performance monitoring interrupts
+IWI:          0          0          0          0          0          0          0          0   IRQ work interrupts
+RTR:          7          0          0          0          0          0          0          0   APIC ICR read retries
+RES:          2          1          1          1          0          1          1          0   Rescheduling interrupts
+CAL:          8         13          6         13         13         13         13         13   Function call interrupts
+TLB:          0          0          0          0          0          0          0          0   TLB shootdowns
+
+
+发现异常机器没有MSI
+ucf [ scripts ]# gzip -dc /proc/config.gz |grep -i MSI
+CONFIG_ARCH_SUPPORTS_MSI=y
+# CONFIG_PCI_MSI is not set
+
+下面是正常机器的MSI
+ucf [ /root ]# gzip -dc /proc/config.gz |grep -i MSI
+CONFIG_ARCH_SUPPORTS_MSI=y
+CONFIG_PCI_MSI=y
+ucf [ /root ]# uname -sa
+Linux ucf 3.8.0 #3 SMP Fri Feb 22 13:23:13 CST 2013 i686 GNU/Linux
+
+原因找到：是kernel没有将MSI支持带进去。
+
+

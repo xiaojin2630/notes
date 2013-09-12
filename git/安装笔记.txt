@@ -1,0 +1,124 @@
+
+***************************************
+            Git安装笔记
+***************************************
+
+1. 安装
+=========================================================
+操作系统: Debian GNU/Linux 6.0(2.6.32-5-686)
+
+1.1 下载
+----------------
+root [ ~ ]# wget https://git-core.googlecode.com/files/git-1.8.1.4.tar.gz
+
+1.2 编译
+----------------
+root [ ~ ]# ./configure --prefix=/usr
+root [ ~ ]# make prefix=/usr all 
+
+1.3 制作启动脚本
+----------------
+root [ ~ ]# cd /usr/local/etc/rc.d/
+root [ ~ ]# vi git_daemon
+
+#!/bin/sh
+
+#git_daemon="/usr/local/git-1.8.1.4/libexec/git-core/git-daemon"
+git_daemon="git daemon"
+options="--syslog --reuseaddr --base-path=/tmp  --export-all --enable=receive-pack"
+
+#--enable=receive-pack --enable-upload-pack
+
+if [ $# -ne 1 ] ; then
+        echo 
+fi
+
+
+git_start() {
+        echo "starting git_daemon ..."
+        ${git_daemon} ${options} ${base_path} &
+}
+
+git_stop() {
+        echo "stop git_daemon ..."
+        killall git-daemon 
+}
+
+case $1 in 
+        start)
+                git_start 
+                ;;
+        stop)
+                git_stop
+                ;;
+        restart)
+                git_start ; git_stop
+                ;;
+esac
+
+1.4 制作repo
+----------------
+
+root [ ~ ]# su -l root 
+root [ ~ ]# cd /tmp
+root [ ~ ]# mkdir foo.git
+root [ ~ ]# git init --bare foo.git
+
+1.5 启动
+----------------
+root [ ~ ]# cd /usr/local/etc/rc.d/
+root [ ~ ]# ./git_daemon start 
+root [ ~ ]# netstat -ant 确保有 TCP 9418 端口在监听.
+
+1.6 测试
+----------------
+root [ ~ ]# cd /root
+root [ ~ ]# git clone git://localhost/foo.git
+root [ ~ ]# cd foo
+root [ ~ ]# touch 1.txt
+root [ ~ ]# git add 1.txt
+root [ ~ ]# git commit -m 'add file: 1.txt'
+root [ ~ ]# git push origin push 
+
+
+
+
+
+2. 常见问题
+=========================================================
+
+2.1 git push (origin master)失败
+----------------
+xiaoj [ foo ]$ git push
+Counting objects: 5, done.
+Writing objects: 100% (3/3), 242 bytes, done.
+Total 3 (delta 0), reused 0 (delta 0)
+remote: Empty compile time value given to use lib at hooks/update line 6
+remote: Use of uninitialized value in require at hooks/update line 7.
+remote: Can't locate Gitolite/Hooks/Update.pm in @INC (@INC contains:  /etc/perl /usr/local/lib/perl/5.10.1
+		/usr/local/share/perl/5.10.
+		1 /usr/lib/perl5 /usr/share/perl5 /usr/lib/perl/5.10 /usr/share/perl/5.10 /usr/local/lib/site_perl .) at
+hooks/update line 7.
+remote: BEGIN failed--compilation aborted at hooks/update line 7.
+remote: error: hook declined to update refs/heads/master
+To git://localhost/foo
+ ! [remote rejected] master -> master (hook declined)
+error: 无法推送一些引用到 'git://localhost/foo'
+
+
+网上说是 foo.git 权限问题,一般是root。而我的这人有git.
+后来将foo.git 删除了，重新 mkdir foo.git ; git init --bare foo.git 解决了此问题.
+root [ tmp ]# ls -l
+总用量 12
+-rw-r--r-- 1 xiaoj root  395  2月 26 21:28 admin.pub
+drwxr-xr-x 7 root  root 1024  2月 27 11:38 foo2.git
+drwxrwx--- 7 git   root 1024  2月 27 11:33 foo.git
+-rw-r--r-- 1 xiaoj root  395  2月 26 21:00 id_rsa.pub
+-rw-r--r-- 1 xiaoj root  506  2月 26 19:37 interfaces
+-rw------- 1 xiaoj root 1679  2月 26 19:36 my
+-rw-r--r-- 1 xiaoj root 1131  2月 26 19:37 sources.list
+drwx------ 2 root  root 1024  2月 26 19:35 tmux-0
+drwx------ 2 xiaoj root 1024  2月 26 14:25 tmux-1000
+-rw-r--r-- 1 xiaoj root  395  2月 26 20:40 vm.pub
+
+

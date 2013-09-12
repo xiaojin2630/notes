@@ -1,0 +1,45 @@
+
+用高版本的gcc编译grub-0.97得到的*_stage1_5文件均120+Mb
+=========================================================
+
+用ubuntu-12.10 编译grub-0.97 得到的*_stage1_5文件好大，挺奇怪的。后来想到自己以前用lfs-6.3时(gcc-4.1.x)
+没有问题.  gcc-4.5 gcc-4.7均不行。
+./stage2/e2fs_stage1_5	 	./stage2/ufs2_stage1_5
+./stage2/iso9660_stage1_5 	./stage2/jfs_stage1_5
+./stage2/xfs_stage1_5		./stage2/minix_stage1_5
+./stage2/fat_stage1_5 		./stage2/vstafs_stage1_5
+./stage2/reiserfs_stage1_5 	./stage2/ffs_stage1_5
+
+于是从源码编译了gcc-4.1.2
+
+
+编译前准备工作:
+	apt-get install libc6-dev libgmp-dev libmpfr-dev texinfo
+	cd /usr/include/
+	ln -s i386-linux-gnu/bits bits
+	ln -s i386-linux-gnu/gnu gnu 
+	ln -s i386-linux-gnu/sys sys
+	ln -s i386-linux-gnu/asm asm 
+
+	cd /usr/lib/
+	ln -s i386-linux-gnu/crt1.o crt1.o
+	ln -s i386-linux-gnu/crti.o crti.o
+	ln -s i386-linux-gnu/crtn.o crtn.o 
+
+编译:
+	tar xjf gcc-4.1.2.tar.bz2  -C tmp/
+	cd gcc-4.1.2/
+	mkdir build
+	../configure --prefix=/usr/local --program-prefix=sse- --libexecdir=/usr/local/lib --enable-shared \
+	--enable-threads=posix --enable-__cxa_atexit --enable-clocale=gnu --disable-multilib --enable-languages=c,c++
+	make -j 4 bootstrap
+	make install 
+
+	cd /usr/local/bin
+	ln -s  i686-pc-linux-gnu-sse-gcc gcc-4.1.2
+	ln -s i686-pc-linux-gnu-sse-g++ g++-4.1.2
+
+
+
+
+
