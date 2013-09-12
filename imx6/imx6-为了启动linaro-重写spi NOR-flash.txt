@@ -1,0 +1,87 @@
+# dd if=iMX6DQ_SPI_to_uSDHC3.bin of=/dev/mmcblk1
+2+1 records in
+2+1 records out
+# fdisk -l
+
+Disk /dev/mtdblock0: 0 MB, 262144 bytes
+255 heads, 63 sectors/track, 0 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+Disk /dev/mtdblock0 doesn't contain a valid partition table
+
+Disk /dev/mtdblock1: 1 MB, 1835008 bytes
+255 heads, 63 sectors/track, 0 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+Disk /dev/mtdblock1 doesn't contain a valid partition table
+
+Disk /dev/mmcblk0: 3951 MB, 3951034368 bytes
+4 heads, 16 sectors/track, 120576 cylinders
+Units = cylinders of 64 * 512 = 32768 bytes
+
+        Device Boot      Start         End      Blocks  Id System
+/dev/mmcblk0p1             321      120576     3848192  83 Linux
+
+Disk /dev/mmcblk1: 7822 MB, 7822376960 bytes
+4 heads, 16 sectors/track, 238720 cylinders
+Units = cylinders of 64 * 512 = 32768 bytes
+
+Disk /dev/mmcblk1 doesn't contain a valid partition table
+# 
+
+U-Boot 2009.08-svn4 (Jan 14 2013 - 10:05:18)
+
+CPU: Freescale i.MX6 family TO0.0 at 792 MHz
+Temperature:   46 C, calibration data 0x58d4f57d
+mx6q pll1: 792MHz
+mx6q pll2: 528MHz
+mx6q pll3: 480MHz
+mx6q pll8: 50MHz
+ipg clock     : 66000000Hz
+ipg per clock : 66000000Hz
+uart clock    : 80000000Hz
+cspi clock    : 60000000Hz
+ahb clock     : 132000000Hz
+axi clock   : 264000000Hz
+emi_slow clock: 29333333Hz
+ddr clock     : 528000000Hz
+usdhc1 clock  : 198000000Hz
+usdhc2 clock  : 198000000Hz
+usdhc3 clock  : 198000000Hz
+usdhc4 clock  : 198000000Hz
+nfc clock     : 24000000Hz
+Board: MX6Q-SABRELITE:[ POR]
+Boot Device: I2C
+I2C:   ready
+DRAM:   1 GB
+MMC:   FSL_USDHC: 0,FSL_USDHC: 1
+JEDEC ID: 0xbf:0x25:0x41
+Reading SPI NOR flash 0xc0000 [0x2000 bytes] -> ram 0x276009b8
+SUCCESS
+
+In:    serial
+Out:   serial
+Err:   serial
+Net:   got MAC address from IIM: 00:00:00:00:00:00
+FEC0 [PRIME]
+Hit any key to stop autoboot:  0 
+MX6Q SABRELITE U-Boot > mmc dev 0 
+mmc0 is current device
+MX6Q SABRELITE U-Boot > mmc read 0x10800000 0 200 
+
+MMC read: dev # 0, block # 0, count 512 ... 512 blocks read: OK
+MX6Q SABRELITE U-Boot > sf probe
+Usage: sf probe [bus:]cs [hz] [mode]
+MX6Q SABRELITE U-Boot > sf probe 1 
+JEDEC ID: 0xbf:0x25:0x41
+2048 KiB SST25VF016B - 2MB at 0:1 is now current device
+MX6Q SABRELITE U-Boot > sf erase 0 0x40000
+Erasing SPI NOR flash 0x0 [0x40000 bytes]
+................................................................SUCCESS
+
+MX6Q SABRELITE U-Boot >  sf write 0x10800000 0 0x40000
+Writing SPI NOR flash 0x0 [0x40000 bytes] <- ram 0x10800000
+...SUCCESS
+
+MX6Q SABRELITE U-Boot > 
+

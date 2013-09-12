@@ -1,0 +1,7 @@
+
+make ARCH=arm menuconfig
+
+make ARCH=arm CROSS_COMPILE=armv7l-timesys-linux-gnueabi- clean 
+
+make ARCH=arm CROSS_COMPILE=armv7l-timesys-linux-gnueabi- uImage -j2
+

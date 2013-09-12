@@ -1,0 +1,90 @@
+baudrate=115200
+boot_fdt=try
+bootcmd=mmc dev 0; if mmc rescan ; then setenv mmcdev 0; echo SD/MMC found on device ${mmcdev}; if run loadbootenv; then run importbootenv; fi; if test -n $uenvcmd; then echo Running uenvcmd ...; run uenvcmd;fi; fi;mmc dev 1; if mmc rescan ; then setenv mmcdev 1; echo SD/MMC found on device ${mmcdev}; if run loadbootenv; then run importbootenv; fi; if test -n $uenvcmd; then echo Running uenvcmd ...; run uenvcmd; fi; fi
+bootdelay=1
+bootscript=echo Running bootscript from mmc ...; source
+console=ttymxc1
+ethact=FEC
+ethprime=FEC
+fdt_addr=0x11000000
+fdt_file=/dtbs/imx6q-sabrelite.dtb
+fdt_high=0xffffffff
+importbootenv=echo Importing environment from mmc (uEnv.txt)...; env import -t ${loadaddr} ${filesize}
+initrd_high=0xffffffff
+ip_dyn=yes
+loadaddr=0x12000000
+loadbootenv=load mmc ${mmcdev}:${mmcpart} ${loadaddr} uEnv.txt
+loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${script};
+loadfdt=load mmc ${mmcdev}:${mmcpart} ${fdt_addr} ${fdt_file}
+loadzimage=load mmc ${mmcdev}:${mmcpart} ${loadaddr} zImage
+mmcargs=setenv bootargs console=${console},${baudrate} ${optargs} root=${mmcroot} rootfstype=${mmcrootfstype} video=${video}
+mmcboot=echo Booting from mmc ...; run mmcargs; bootz ${loadaddr} - ${fdt_addr};
+mmcdefault=echo Booting from mmc ...; run mmcargs; if test ${boot_fdt} = yes || test ${boot_fdt} = try; then if run loadfdt; then bootm ${loadaddr} - ${fdt_addr}; else if test ${boot_fdt} = try; then bootm; else echo WARN: Cannot load the DT; fi; fi; else bootm; fi;
+mmcdev=0
+mmcpart=1
+mmcroot=/dev/mmcblk0p2 ro
+mmcrootfstype=ext4 rootwait fixrtc
+netargs=setenv bootargs console=${console},${baudrate} root=/dev/nfs ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp
+netboot=echo Booting from net ...; run netargs; if test ${ip_dyn} = yes; then setenv get_cmd dhcp; else setenv get_cmd tftp; fi; ${get_cmd} ${uimage}; if test ${boot_fdt} = yes || test ${boot_fdt} = try; then if ${get_cmd} ${fdt_addr} ${fdt_file}; then bootm ${loadaddr} - ${fdt_addr}; else if test ${boot_fdt} = try; then bootm; else echo WARN: Cannot load the DT; fi; fi; else bootm; fi;
+script=boot.scr
+uimage=uImage
+video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24
+
+Environment size: 2244/8188 bytes
+
+uImage-3.0-ts-armv7l
+
+
+=>$loadbootenv
+  load mmc ${mmcdev}:${mmcpart} ${loadaddr} uEnv.txt
+=>$uenvcmd
+  run loadzimage; run loadfdt; run mmcboot
+
+  ==> $loadzimage
+      load mmc ${mmcdev}:${mmcpart} ${loadaddr} uImage-3.0-ts-armv7l
+
+setenv loadaddr 0x10008000
+ext2load mmc 1:1 10800000 /boot/uImage && bootm 10800000;
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1920x1080M@60,if=RGB24 root=/dev/mmcblk1p2 rootwait fixrtc 
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1440x900M@60,if=RGB24 root=/dev/mmcblk1p2 rootwait fixrtc
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,1024x768M@60,if=RGB24 root=/dev/mmcblk1p2 rootwait fixrtc 
+setenv bootargs console=ttymxc1,115200 video=mxcfb0:dev=hdmi,800x600M@60,if=RGB24 root=/dev/mmcblk1p2 rootwait fixrtc 
+
+
+
+
+[   298.304] (II) LoadModule: "fbdevhw"
+[   298.304] (II) Loading /usr/lib/xorg/modules/libfbdevhw.so
+[   298.307] (II) Module fbdevhw: vendor="X.Org Foundation"
+[   298.307]    compiled for 1.12.4, module version = 0.0.2
+[   298.307]    ABI class: X.Org Video Driver, version 12.1
+[   298.307] (II) FBDEV(0): using default device
+[   298.308] (WW) VGA arbiter: cannot open kernel arbiter, no multi-card support
+[   298.308] (II) FBDEV(0): Creating default Display subsection in Screen section
+        "Default Screen Section" for depth/fbbpp 16/16
+[   298.308] (==) FBDEV(0): Depth 16, (==) framebuffer bpp 16
+[   298.308] (==) FBDEV(0): RGB weight 565
+[   298.308] (==) FBDEV(0): Default visual is TrueColor
+[   298.308] (==) FBDEV(0): Using gamma correction (1.0, 1.0, 1.0)
+[   298.308] (II) FBDEV(0): hardware: DISP3 BG (video memory: 2531kB)
+[   298.309] (II) FBDEV(0): checking modes against framebuffer device...
+[   298.309] (II) FBDEV(0): checking modes against monitor...
+[   298.309] (--) FBDEV(0): Virtual size is 1280x720 (pitch 1280)
+[   298.309] (**) FBDEV(0):  Built-in mode "current": 74.2 MHz, 45.0 kHz, 60.0 Hz
+[   298.309] (II) FBDEV(0): Modeline "current"x0.0   74.25  1280 1390 1430 1650  720 725 730 750 +hsync +vsync -csync (45.0 kHz
+ b)
+[   298.309] (==) FBDEV(0): DPI set to (96, 96)
+[   298.309] (II) Loading sub module "fb"
+[   298.309] (II) LoadModule: "fb"
+[   298.310] (II) Loading /usr/lib/xorg/modules/libfb.so
+[   298.317] (II) Module fb: vendor="X.Org Foundation"
+[   298.317]    compiled for 1.12.4, module version = 1.0.0
+[   298.317]    ABI class: X.Org ANSI C Emulation, version 0.4
+[   298.317] (**) FBDEV(0): using shadow framebuffer
+[   298.318] (II) Loading sub module "shadow"
+
+
+
+alsa-utils alsa-tools
+
+

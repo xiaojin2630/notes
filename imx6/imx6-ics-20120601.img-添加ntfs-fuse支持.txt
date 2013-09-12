@@ -1,0 +1,30 @@
+
+
+********** 正在为此kernel 添加 ntfs, fuse支持 ********
+
+	http://github.com/boundarydevices/linux-imx6/tree/boundary-imx-android-r13.4-ga
+
+	git clone git://github.com/boundarydevices/linux-imx6.git
+	git checkout -b sd_android 874d8cd (从uname -sa得知)
+	
+	编译后，android启动成功。(uImage2)
+	1|root@android:/ # busybox uname -sa                                           
+	Linux localhost 3.0.15-g874d8cd #2 SMP PREEMPT Sat Jun 8 14:37:16 CST 2013 armv7l GNU/Linux
+	
+	root@android:/ # busybox gzip -dc /proc/config.gz |busybox egrep -i 'ntfs|fuse'
+	# CONFIG_FUSE_FS is not set
+	# CONFIG_NTFS_FS is not set
+
+	现make menuconfig 添加ntfs,fuse支持: (uImage-g874d8cd_2)
+	android可以正常启动。
+	127|root@android:/ # busybox egrep -i 'fuse|ntfs' /proc/filesystems            
+	ntfs
+	nodev	fuse
+	fuseblk
+	nodev	fusectl
+
+	root@android:/ # busybox uname -sa
+	Linux localhost 3.0.15-g874d8cd #3 SMP PREEMPT Sat Jun 8 14:45:33 CST 2013 armv7l GNU/Linux
+
+	尝试 com.paragon.mounter-1.apk 软件，可以mount NTFS U盘。
+	尝试 busybox mount /dev/block/sda1 /mnt/sdcard/ntfs -t ntfs 也可以。

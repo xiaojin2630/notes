@@ -1,0 +1,26 @@
+视频播放器:
+=======================
+moboplayer
+	支持流媒体 http(测试失败) rstp
+	播放 1个.mkv不能快进.
+	支持硬件解码(测试OK)
+
+
+MX player
+	支持流媒体 http(测试OK)
+	支持硬件解码(测试OK)
+	播放 逃离德黑兰-Argo.2012.720p.BluRay.x264-SPARKS.mkv ，出现无法解码音频. (dts)
+	播放了几个 .mkv 均 出现无法解码音频. (dts)
+	rmvb 格式似乎不支持。
+
+
+dicePlayer 
+	UI做的不错，支持bookmark , http,smb,ftp等。
+	支持硬解码(OK)
+	rmvb 格式似乎不支持。
+	肖申克的救赎.1994.中英字幕.国英双语 无法显示字幕，单轨OK。
+
+vplayer
+	BOOKMARK做的不错。
+	支持硬解码(OK)
+	支持流媒体(播放较卡，且无声音).
