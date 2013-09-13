@@ -1,0 +1,45 @@
+
+ 获取内核打印msg时的时间戳
+
+make menuconfig内核时直接指定“Kernel hacking”中的“Show timing information on printks”
+来强制每次启动均为内核信息增加时间戳。
+
+
+将内核启动信息输出到文件：
+
+dmesg -s 131072 > ktime
+
+
+
+/usr/src/linux-x.xx.xx/scripts/show_delta ktime > dtime
+
+这样，你就得到了一份关于Linux启动时间消耗的详细报告。
+
+
+
+如下：
+[5.216565 < 0.014448 >] sd 0:0:0:0: [sda] Mode Sense: 00 3a 00 00
+[5.216620 < 0.000055 >] sd 0:0:0:0: [sda] Write cache: disabled, read cache: enabled, doesn't support DPO or FUA
+[5.244998 < 0.028378 >]  sda: sda1 sda2
+[5.253870 < 0.008872 >] sd 0:0:0:0: [sda] Attached SCSI disk
+[5.256585 < 0.002715 >] ata3.00: SATA link down (SStatus 0 SControl 300)
+[5.256603 < 0.000018 >] ata3.01: SATA link down (SStatus 0 SControl 300)
+[5.943013 < 0.686410 >] ata4.01: failed to resume link (SControl 0)
+[5.969433 < 0.026420 >] ata4.00: SATA link down (SStatus 0 SControl 300)
+[5.986481 < 0.017048 >] ata4.01: SATA link down (SStatus 0 SControl 0)
+[6.003113 < 0.016632 >] Freeing unused kernel memory: 360k freed
+[6.018287 < 0.015174 >] Write protecting the kernel text: 2988k
+[6.033031 < 0.014744 >] Write protecting the kernel read-only data: 688k
+[6.050073 < 0.017042 >] NX-protecting the kernel data: 3156k
+[6.451197 < 0.401124 >] EXT4-fs (sda1): mounting ext3 file system using the ext4 subsystem
+[6.592995 < 0.141798 >] EXT4-fs (sda1): recovery complete
+[6.595162 < 0.002167 >] EXT4-fs (sda1): mounted filesystem with ordered data mode. Opts: (null)
+[6.690314 < 0.095152 >] FAT-fs (sda2): utf8 is not a recommended IO charset for FAT filesystems, filesystem will be c
+[6.804736 < 0.114422 >] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[6.822332 < 0.017596 >] 8021q: adding VLAN 0 to HW filter on device eth0
+[6.920716 < 0.098384 >] IPv6: ADDRCONF(NETDEV_UP): eth1: link is not ready
+[6.938298 < 0.017582 >] 8021q: adding VLAN 0 to HW filter on device eth1
+[7.036722 < 0.098424 >] IPv6: ADDRCONF(NETDEV_UP): eth2: link is not ready
+
+
+

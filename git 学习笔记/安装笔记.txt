@@ -1,22 +1,22 @@
 
 ***************************************
-            Gitå®‰è£…ç¬”è®°
+            Git°²×°±Ê¼Ç
 ***************************************
 
-1. å®‰è£…
+1. °²×°
 =========================================================
-æ“ä½œç³»ç»Ÿ: Debian GNU/Linux 6.0(2.6.32-5-686)
+²Ù×÷ÏµÍ³: Debian GNU/Linux 6.0(2.6.32-5-686)
 
-1.1 ä¸‹è½½
+1.1 ÏÂÔØ
 ----------------
 root [ ~ ]# wget https://git-core.googlecode.com/files/git-1.8.1.4.tar.gz
 
-1.2 ç¼–è¯‘
+1.2 ±àÒë
 ----------------
 root [ ~ ]# ./configure --prefix=/usr
 root [ ~ ]# make prefix=/usr all 
 
-1.3 åˆ¶ä½œå¯åŠ¨è„šæœ¬
+1.3 ÖÆ×÷Æô¶¯½Å±¾
 ----------------
 root [ ~ ]# cd /usr/local/etc/rc.d/
 root [ ~ ]# vi git_daemon
@@ -56,7 +56,7 @@ case $1 in
                 ;;
 esac
 
-1.4 åˆ¶ä½œrepo
+1.4 ÖÆ×÷repo
 ----------------
 
 root [ ~ ]# su -l root 
@@ -64,13 +64,13 @@ root [ ~ ]# cd /tmp
 root [ ~ ]# mkdir foo.git
 root [ ~ ]# git init --bare foo.git
 
-1.5 å¯åŠ¨
+1.5 Æô¶¯
 ----------------
 root [ ~ ]# cd /usr/local/etc/rc.d/
 root [ ~ ]# ./git_daemon start 
-root [ ~ ]# netstat -ant ç¡®ä¿æœ‰ TCP 9418 ç«¯å£åœ¨ç›‘å¬.
+root [ ~ ]# netstat -ant È·±£ÓĞ TCP 9418 ¶Ë¿ÚÔÚ¼àÌı.
 
-1.6 æµ‹è¯•
+1.6 ²âÊÔ
 ----------------
 root [ ~ ]# cd /root
 root [ ~ ]# git clone git://localhost/foo.git
@@ -84,10 +84,10 @@ root [ ~ ]# git push origin push
 
 
 
-2. å¸¸è§é—®é¢˜
+2. ³£¼ûÎÊÌâ
 =========================================================
 
-2.1 git push (origin master)å¤±è´¥
+2.1 git push (origin master)Ê§°Ü
 ----------------
 xiaoj [ foo ]$ git push
 Counting objects: 5, done.
@@ -103,22 +103,21 @@ remote: BEGIN failed--compilation aborted at hooks/update line 7.
 remote: error: hook declined to update refs/heads/master
 To git://localhost/foo
  ! [remote rejected] master -> master (hook declined)
-error: æ— æ³•æ¨é€ä¸€äº›å¼•ç”¨åˆ° 'git://localhost/foo'
+error: ÎŞ·¨ÍÆËÍÒ»Ğ©ÒıÓÃµ½ 'git://localhost/foo'
 
 
-ç½‘ä¸Šè¯´æ˜¯ foo.git æƒé™é—®é¢˜,ä¸€èˆ¬æ˜¯rootã€‚è€Œæˆ‘çš„è¿™äººæœ‰git.
-åæ¥å°†foo.git åˆ é™¤äº†ï¼Œé‡æ–° mkdir foo.git ; git init --bare foo.git è§£å†³äº†æ­¤é—®é¢˜.
+ÍøÉÏËµÊÇ foo.git È¨ÏŞÎÊÌâ,Ò»°ãÊÇroot¡£¶øÎÒµÄÕâÈËÓĞgit.
+ºóÀ´½«foo.git É¾³ıÁË£¬ÖØĞÂ mkdir foo.git ; git init --bare foo.git ½â¾öÁË´ËÎÊÌâ.
 root [ tmp ]# ls -l
-æ€»ç”¨é‡ 12
--rw-r--r-- 1 xiaoj root  395  2æœˆ 26 21:28 admin.pub
-drwxr-xr-x 7 root  root 1024  2æœˆ 27 11:38 foo2.git
-drwxrwx--- 7 git   root 1024  2æœˆ 27 11:33 foo.git
--rw-r--r-- 1 xiaoj root  395  2æœˆ 26 21:00 id_rsa.pub
--rw-r--r-- 1 xiaoj root  506  2æœˆ 26 19:37 interfaces
--rw------- 1 xiaoj root 1679  2æœˆ 26 19:36 my
--rw-r--r-- 1 xiaoj root 1131  2æœˆ 26 19:37 sources.list
-drwx------ 2 root  root 1024  2æœˆ 26 19:35 tmux-0
-drwx------ 2 xiaoj root 1024  2æœˆ 26 14:25 tmux-1000
--rw-r--r-- 1 xiaoj root  395  2æœˆ 26 20:40 vm.pub
-
+×ÜÓÃÁ¿ 12
+-rw-r--r-- 1 xiaoj root  395  2ÔÂ 26 21:28 admin.pub
+drwxr-xr-x 7 root  root 1024  2ÔÂ 27 11:38 foo2.git
+drwxrwx--- 7 git   root 1024  2ÔÂ 27 11:33 foo.git
+-rw-r--r-- 1 xiaoj root  395  2ÔÂ 26 21:00 id_rsa.pub
+-rw-r--r-- 1 xiaoj root  506  2ÔÂ 26 19:37 interfaces
+-rw------- 1 xiaoj root 1679  2ÔÂ 26 19:36 my
+-rw-r--r-- 1 xiaoj root 1131  2ÔÂ 26 19:37 sources.list
+drwx------ 2 root  root 1024  2ÔÂ 26 19:35 tmux-0
+drwx------ 2 xiaoj root 1024  2ÔÂ 26 14:25 tmux-1000
+-rw-r--r-- 1 xiaoj root  395  2ÔÂ 26 20:40 vm.pub
 
